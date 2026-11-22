@@ -1,6 +1,6 @@
 # The Hidden Cost of Kubernetes Availability
 
-An AWS Community Builders hands-on lab for diagnosing why Karpenter keeps an underutilized EKS node. Compare a restrictive Pod Disruption Budget (PDB), a zero NodePool disruption budget, and a successful consolidation while holding workload placement and capacity constant.
+A hands-on lab for diagnosing why Karpenter keeps an underutilized EKS node. Compare a restrictive Pod Disruption Budget (PDB), a zero NodePool disruption budget, and a successful consolidation while holding workload placement and capacity constant.
 
 Read the [illustrated article](ARTICLE.md) or run the experiment below.
 
