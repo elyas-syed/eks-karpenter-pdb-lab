@@ -1,0 +1,19 @@
+Copyright (c) 2026 Elyas Syed
+
+The written content and diagrams in this repository are licensed under the
+Creative Commons Attribution 4.0 International License (CC BY 4.0):
+
+- ARTICLE.md
+- README.md
+- docs/images/ (SVG and PNG diagrams)
+
+You may share and adapt this material for any purpose, including commercially,
+as long as you give appropriate credit, link to the license, and indicate if
+changes were made.
+
+Full license text: https://creativecommons.org/licenses/by/4.0/legalcode
+Summary: https://creativecommons.org/licenses/by/4.0/
+
+Source code, including the Terraform configuration, Kubernetes manifests,
+scripts/lab.sh and docs/diagrams.py, is licensed separately under the MIT
+License in LICENSE.
