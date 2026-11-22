@@ -1,0 +1,9 @@
+terraform {
+  backend "s3" {
+    bucket       = "REPLACE_WITH_VERSIONED_PRIVATE_STATE_BUCKET"
+    region       = "us-east-2"
+    key          = "karpenter-pdb-lab/controller/terraform.tfstate"
+    encrypt      = true
+    use_lockfile = true
+  }
+}
