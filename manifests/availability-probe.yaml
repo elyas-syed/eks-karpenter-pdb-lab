@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: availability-probe
+  namespace: pdb-lab
+spec:
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  activeDeadlineSeconds: 720
+  nodeSelector:
+    lab.example.com/baseline: "true"
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65532
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: probe
+      image: public.ecr.aws/docker/library/busybox:1.37.0
+      command: ["/bin/sh", "-ec"]
+      args:
+        - |
+          while true; do
+            if [ "$(wget -q -T 2 -O - http://demo:8080/)" = ready ]; then
+              echo request_succeeded
+            else
+              echo request_failed
+            fi
+            sleep 1
+          done
+      resources:
+        requests:
+          cpu: 25m
+          memory: 16Mi
+        limits:
+          memory: 64Mi
+      securityContext:
+        readOnlyRootFilesystem: true
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: [ALL]

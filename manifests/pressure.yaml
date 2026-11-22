@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: pressure
+  namespace: pdb-lab
+spec:
+  selector:
+    matchLabels:
+      app: pdb-pressure
+  template:
+    metadata:
+      labels:
+        app: pdb-pressure
+    spec:
+      automountServiceAccountToken: false
+      nodeSelector:
+        lab.example.com/baseline: "true"
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: pressure
+          image: registry.k8s.io/pause:3.10
+          resources:
+            requests:
+              cpu: 2100m
+              memory: 16Mi
+            limits:
+              memory: 32Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]

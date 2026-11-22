@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo
+  namespace: pdb-lab
+spec:
+  replicas: 3
+  minReadySeconds: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: pdb-demo
+  template:
+    metadata:
+      labels:
+        app: pdb-demo
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 15
+      topologySpreadConstraints:
+        - maxSkew: 1
+          minDomains: 2
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: pdb-demo
+      nodeSelector:
+        lab.example.com/placement: pdb
+      tolerations:
+        - key: lab.example.com/experiment
+          operator: Equal
+          value: pdb
+          effect: NoSchedule
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: demo
+          image: public.ecr.aws/docker/library/busybox:1.37.0
+          command: ["/bin/sh", "-ec"]
+          args:
+            - |
+              printf 'ready\n' > /www/index.html
+              exec httpd -f -p 8080 -h /www
+          ports:
+            - name: http
+              containerPort: 8080
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sleep", "5"]
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 2
+          volumeMounts:
+            - name: web
+              mountPath: /www
+          resources:
+            requests:
+              cpu: "1"
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+      volumes:
+        - name: web
+          emptyDir:
+            sizeLimit: 8Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo
+  namespace: pdb-lab
+spec:
+  selector:
+    app: pdb-demo
+  ports:
+    - port: 8080
+      targetPort: http
